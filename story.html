@@ -246,6 +246,7 @@ body::before{display:none}
 
 <script>
 /* ============ ТУТ МОЖНО МЕНЯТЬ ТЕКСТЫ ============ */
+const BGM_DELAY = 3000;   /* задержка фоновой песни после «Готова», мс */
 const CONFIG = {
   prologue: [
     "Жила-была девушка по имени Айдана.",
@@ -423,8 +424,10 @@ $('ready').onclick=()=>{
 /* 2) настоящее начало */
 $('ready2').onclick=()=>{
   (function out(){ const v=getVol('joke'); if(v>0.06){setVol('joke',v-0.06);setTimeout(out,60);}else{jokeA.pause();danceV.pause();} })();
-  /* фоновая песня стартует сразу, тихо на фоне */
-  setVol('bgm',0.15); bgm.currentTime=0; bgm.play().catch(()=>{});
+  /* фоновая песня: старт через BGM_DELAY мс (плюс 4 с тишины в самом файле), тихо на фоне */
+  setVol('bgm',0.15);
+  bgm.play().then(()=>{bgm.pause();bgm.currentTime=0;}).catch(()=>{});   /* «разблокировка» жестом для iPhone */
+  setTimeout(()=>{bgm.currentTime=0;bgm.play().catch(()=>{});},BGM_DELAY);
   show('s-video');
   introV.currentTime=0;introV.volume=1;introV.muted=bgm.muted;
   introV.play().catch(()=>{introV.muted=true;introV.play().catch(()=>toPrologue());});
