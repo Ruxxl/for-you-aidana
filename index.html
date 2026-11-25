@@ -249,10 +249,10 @@ function buildDots(){$('dots').innerHTML=CONFIG.chapters.map((_,i)=>`<div class=
 function startLevel(){
   show('s-game');
   const L=CONFIG.chapters[lvl];
-  $('chap-label').textContent=`Глава ${lvl+1} из ${CONFIG.chapters.length}`;
-  $('lvl-title').textContent=L.title;
+  $('chap-label').textContent='Первая подача';
+  $('lvl-title').textContent='Подбрось мяч судьбе';
   $('msg').textContent='';$('ball').className='ball';
-  buildDots();misses=0;newZone();
+  $('dots').innerHTML='';misses=0;newZone();
   playing=true;t0=performance.now();cancelAnimationFrame(raf);loop();
 }
 function newZone(){
@@ -263,7 +263,7 @@ function newZone(){
 }
 function loop(){
   if(!playing)return;
-  const speed=0.0016+lvl*0.00035;
+  const speed=0.0008;
   const t=(performance.now()-t0)*speed;
   pos=(Math.sin(t*Math.PI*2-Math.PI/2)+1)/2*96;
   $('marker').style.left=pos+'%';
@@ -293,7 +293,7 @@ function reveal(){
   petals(10);show('s-reveal');
   playLines($('r-story'),L.lines,()=>{$('next').style.visibility='visible';},2400);
 }
-$('next').onclick=()=>{lvl++; if(lvl>=CONFIG.chapters.length)finale();else startLevel();};
+$('next').onclick=()=>{lvl++; if(lvl>=CONFIG.chapters.length)finale();else reveal();};
 $('go').onclick=startLevel;
 
 /* финал */
