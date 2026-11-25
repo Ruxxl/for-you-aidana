@@ -89,9 +89,47 @@ body.started #mute{display:flex;align-items:center;justify-content:center}
 
 .petal{position:fixed;top:-30px;pointer-events:none;z-index:40;animation:fall linear forwards;filter:drop-shadow(0 0 6px #ff8fb188)}
 @keyframes fall{to{transform:translateY(112vh) translateX(40px) rotate(360deg)}}
+
+/* ===== СТЕКЛО ===== */
+body{background:linear-gradient(160deg,#2a0f2e 0%,#3b1346 45%,#1a0a24 100%);background-attachment:fixed}
+body::before{display:none}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.75;pointer-events:none;z-index:0;animation:drift 18s ease-in-out infinite alternate}
+.o1{width:60vmax;height:60vmax;left:-20vmax;top:-18vmax;background:radial-gradient(circle,#ff5fa2,#ff5fa200 70%)}
+.o2{width:55vmax;height:55vmax;right:-22vmax;top:20vh;background:radial-gradient(circle,#8b5cff,#8b5cff00 70%);animation-delay:-6s}
+.o3{width:50vmax;height:50vmax;left:10vw;bottom:-25vmax;background:radial-gradient(circle,#ffb86b,#ffb86b00 70%);animation-delay:-11s}
+@keyframes drift{to{transform:translate(8vmax,-6vmax) scale(1.15)}}
+.glass,.court,.panel,.polaroid{
+  background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.07));
+  border:1px solid rgba(255,255,255,.28);
+  backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:0 10px 40px rgba(10,0,20,.45),inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.08);
+}
+.panel{border-radius:26px;padding:22px 24px;width:min(560px,92vw);margin:8px 0}
+.panel:empty{display:none}
+.panel p{margin:10px auto}
+.court{border-radius:28px}
+.polaroid{padding:10px;border-radius:26px;transform:none;animation:float 7s ease-in-out infinite}
+.polaroid img{border-radius:18px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+@keyframes float{50%{transform:translateY(-6px)}}
+.btn{
+  color:#fff;font-style:normal;letter-spacing:.02em;
+  background:linear-gradient(135deg,rgba(255,140,190,.55),rgba(255,200,150,.35));
+  border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 8px 28px rgba(255,95,162,.35),inset 0 1px 0 rgba(255,255,255,.5);
+  display:inline-flex;align-items:center;gap:10px;justify-content:center
+}
+.btn.ghost{background:rgba(255,255,255,.1);color:var(--cream);border:1px solid rgba(255,255,255,.3)}
+#mute{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:var(--cream);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.bar{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 2px 8px rgba(0,0,0,.25)}
+.track img{border:1px solid rgba(255,255,255,.35);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.ic svg{width:1em;height:1em;display:block}
+.glow{color:#ff8fb1}
+#mute .ic svg{width:20px;height:20px}
+.ball svg{width:1em;height:1em;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
 </style>
 </head>
 <body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 <button id="mute" aria-label="Звук"><span class="ic" data-icon="sound-on" data-fb="🔊"></span></button>
 <audio id="bgm" loop preload="auto"></audio>
 
@@ -106,7 +144,7 @@ body.started #mute{display:flex;align-items:center;justify-content:center}
 <!-- Пролог -->
 <section class="screen" id="s-prologue">
   <div class="chapter">Пролог</div>
-  <div class="lines" id="prologue-lines"></div>
+  <div class="lines panel" id="prologue-lines"></div>
   <button class="btn" id="go" style="visibility:hidden">Начать</button>
 </section>
 
@@ -127,16 +165,16 @@ body.started #mute{display:flex;align-items:center;justify-content:center}
 <!-- Глава -->
 <section class="screen" id="s-reveal">
   <div class="polaroid"><img id="r-img" alt=""></div>
-  <div class="story lines" id="r-story"></div>
+  <div class="story lines panel" id="r-story"></div>
   <button class="btn" id="next" style="visibility:hidden">Дальше</button>
 </section>
 
 <!-- Финал -->
 <section class="screen" id="finale">
   <div class="glow"><span class="ic" data-icon="heart" data-fb="💗"></span></div>
-  <div class="lines" id="letter"></div>
+  <div class="lines panel" id="letter"></div>
   <div class="strip"><div class="track" id="track"></div></div>
-  <div class="ask" id="ask">
+  <div class="ask panel" id="ask">
     <h2 id="inv-title"></h2>
     <div class="row" id="row">
       <button class="btn" id="yes">Да</button>
@@ -190,19 +228,21 @@ bgm.src=MUSIC;
 const ALL_PHOTOS=[...Array(35)].map((_,i)=>"aidana_"+String(i+1).padStart(2,"0")+".jpg")
   .filter(n=>!["aidana_08.jpg","aidana_10.jpg","aidana_16.jpg","aidana_32.jpg"].includes(n));
 
-/* иконки: файлы в icons/ (svg или png), иначе эмодзи */
+/* иконки: встроенные SVG */
+const ICONS={
+ heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
+ 'sound-on':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
+ 'sound-off':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
+ trophy:'<svg viewBox="0 0 24 24" fill="#f7d9a8"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>',
+ flower:'<svg viewBox="0 0 24 24"><g fill="#ff9ec0"><circle cx="12" cy="6" r="4"/><circle cx="17.7" cy="10.1" r="4"/><circle cx="15.5" cy="16.8" r="4"/><circle cx="8.5" cy="16.8" r="4"/><circle cx="6.3" cy="10.1" r="4"/></g><circle cx="12" cy="12" r="2.6" fill="#ffe3a8"/></svg>',
+ volleyball:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#fff6ea" stroke="#f7d9a8" stroke-width="1.2"/><g stroke="#e85d8f" stroke-width="1.3" stroke-linecap="round"><path d="M12 2c1 5 .2 11-6 15.8"/><path d="M2.4 9.6c5.8-.8 12 1 15.4 8.8"/><path d="M21.6 8.6c-4.8 1.8-8 5.6-8.2 12.8"/></g></svg>'
+};
 function loadIcons(root=document){
   root.querySelectorAll('.ic[data-icon]:not([data-done])').forEach(el=>{
-    el.dataset.done=1;
-    const name=el.dataset.icon, fb=el.dataset.fb||'';
-    const img=new Image(); img.alt='';
-    const tries=['icons/'+name+'.svg','icons/'+name+'.png'];
-    const next=()=>{const u=tries.shift(); if(u){img.src=u;} else {el.textContent=fb;}};
-    img.onerror=next; img.onload=()=>{el.textContent='';el.appendChild(img);};
-    next();
+    el.dataset.done=1; el.innerHTML=ICONS[el.dataset.icon]||el.dataset.fb||'';
   });
 }
-function setIcon(el,name,fb){el.innerHTML='<span class="ic" data-icon="'+name+'" data-fb="'+fb+'"></span>';loadIcons(el);}
+function setIcon(el,name){el.innerHTML='<span class="ic" data-icon="'+name+'"></span>';loadIcons(el);}
 window.addEventListener('DOMContentLoaded',()=>loadIcons());
 
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
@@ -240,7 +280,7 @@ $('ready').onclick=()=>{
 };
 $('mute').onclick=()=>{
   bgm.muted=!bgm.muted;
-  bgm.muted?setIcon($('mute'),'sound-off','🔇'):setIcon($('mute'),'sound-on','🔊');
+  bgm.muted?setIcon($('mute'),'sound-off'):setIcon($('mute'),'sound-on');
 };
 
 /* игра */
